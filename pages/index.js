@@ -1,17 +1,29 @@
+import { MongoClient } from 'mongodb';
 import MeetupList from '../components/meetups/MeetupList';
+import { databaseConnectionString } from '../lib/constants';
 
-function HomePage() {
-  const DUMMY_MEETUPS = [
-    {
-      id: 'm1',
-      title: 'Austia Meetup',
-      image:
-        'https://th-thumbnailer.cdn-si-edu.com/Ejt5akJFA2JjER12jJwUx-kiJ1U=/1000x750/filters:no_upscale()/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer/03/25/03251376-be81-470c-ac01-a15130b3e9b0/kunst889.jpg',
-      address: 'Austia, Vienna',
-      description: 'description',
+function HomePage(props) {
+  return <MeetupList meetups={props.meetups} />;
+}
+
+export async function getServerSideProps(ctx) {
+  const client = await MongoClient.connect(databaseConnectionString);
+
+  const db = client.db();
+
+  const meetupCollection = db.collection('meetup-collection');
+  const meetups = await meetupCollection.find().toArray();
+  client.close();
+  return {
+    props: {
+      meetups: meetups.map((meetupItem) => ({
+        id: meetupItem._id.toString(),
+        title: meetupItem.title,
+        image: meetupItem.image,
+        address: meetupItem.address,
+      })),
     },
-  ];
-  return <MeetupList meetups={DUMMY_MEETUPS} />;
+  };
 }
 
 export default HomePage;
