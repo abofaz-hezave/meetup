@@ -1,12 +1,17 @@
 import { MongoClient } from 'mongodb';
+import { databaseConnectionString } from '../../lib/constants';
 
 async function handler(req, res) {
   if (req.method === 'POST') {
     const data = req.body;
     const { title, image, address, description } = req.body;
-    const client = await MongoClient.connect(
-      `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.9nm7qt6.mongodb.net/meetups?retryWrites=true&w=majority`
-    );
+
+    try {
+      client = await MongoClient.connect(databaseConnectionString);
+    } catch (error) {
+      res.status(500).json({ message: 'Could not connect to database.' });
+      return;
+    }
 
     const db = client.db();
 
