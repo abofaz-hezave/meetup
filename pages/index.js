@@ -1,9 +1,18 @@
+import Head from 'next/head';
 import { MongoClient } from 'mongodb';
 import MeetupList from '../components/meetups/MeetupList';
 import { databaseConnectionString } from '../lib/constants';
 
 function HomePage(props) {
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <>
+      <Head>
+        <title>Dev Meetups</title>
+        <meta name='description' content='Browse through golbal dev meetups' />
+      </Head>
+      <MeetupList meetups={props.meetups} />
+    </>
+  );
 }
 
 export async function getServerSideProps(ctx) {

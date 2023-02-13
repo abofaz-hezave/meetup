@@ -1,9 +1,18 @@
+import Head from 'next/head';
 import { MongoClient, ObjectId } from 'mongodb';
 import MeetupDetail from '../../components/meetups/MeetupDetail';
 import { databaseConnectionString } from '../../lib/constants';
 
 function MeetupDetails({ selectedMeetup }) {
-  return <MeetupDetail {...selectedMeetup} />;
+  return (
+    <>
+      <Head>
+        <title>{selectedMeetup.title}</title>
+        <meta name='description' content={selectedMeetup.description} />
+      </Head>
+      <MeetupDetail {...selectedMeetup} />
+    </>
+  );
 }
 
 export async function getStaticPaths() {
@@ -15,7 +24,7 @@ export async function getStaticPaths() {
   const meetups = await meetupCollection.find({}, { _id: 1 }).toArray();
 
   return {
-    fallback: false,
+    fallback: 'blocking',
     paths: meetups.map((meetupItem) => ({
       params: { meetupId: meetupItem._id.toString() },
     })),
@@ -40,6 +49,7 @@ export async function getStaticProps(ctx) {
         title: selectedMeetup.title,
         image: selectedMeetup.image,
         address: selectedMeetup.address,
+        description: selectedMeetup.description,
       },
     },
   };
